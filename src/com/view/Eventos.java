@@ -5,7 +5,6 @@ import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.Insets;
 
 import javax.swing.JButton;
@@ -15,19 +14,26 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.SwingConstants;
+import javax.swing.table.DefaultTableModel;
 
+import com.service.CarrinhoService;
+import com.service.UsuarioService;
 import com.utils.Change;
 
 
 public class Eventos {
 	JFrame frame = new JFrame();
-	private static JTextField eventoMarcado;
-	private static JTextField eventoEnviado;
-	private static JTextField eventoCriado;
 	private JTable tableEvento;
-
+	private JTextField textField;
+	
+	UsuarioService model = new UsuarioService();
+	CarrinhoService produtos = new CarrinhoService();
+	JButton carrinho = new JButton("Carrinho icon");
+	JButton btnLogin = new JButton("LOGIN");
+	
+	@SuppressWarnings("serial")
 	public Eventos() {
+		Change screen = new Change();
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setSize(700, 700);
 		frame.setResizable(false);
@@ -45,11 +51,10 @@ public class Eventos {
 		lblNewLabel_1.setPreferredSize(new Dimension(90, 50));
 		panel.add(lblNewLabel_1);
 
-		JButton btn = new JButton("LOGIN");
-		btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		btn.setMargin(new Insets(10, 14, 2, 14));
-		btn.setPreferredSize(new Dimension(90, 100));
-		panel.add(btn);
+		btnLogin.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		btnLogin.setMargin(new Insets(10, 14, 2, 14));
+		btnLogin.setPreferredSize(new Dimension(90, 100));
+		panel.add(btnLogin);
 
 		JButton btnNewButton = new JButton("New button");
 		btnNewButton.setPreferredSize(new Dimension(90, 100));
@@ -67,50 +72,56 @@ public class Eventos {
 		btnSair.setPreferredSize(new Dimension(90, 100));
 		panel.add(btnSair);
 
-		eventoMarcado = new JTextField();
-		eventoMarcado.setEditable(false);
-		eventoMarcado.setFont(new Font("Arial Black", Font.PLAIN, 35));
-		eventoMarcado.setHorizontalAlignment(SwingConstants.CENTER);
-		eventoMarcado.setColumns(10);
-		eventoMarcado.setBounds(510, 35, 164, 110);
-		frame.getContentPane().add(eventoMarcado);
-
-		eventoEnviado = new JTextField();
-		eventoEnviado.setEditable(false);
-		eventoEnviado.setFont(new Font("Arial Black", Font.PLAIN, 35));
-		eventoEnviado.setHorizontalAlignment(SwingConstants.CENTER);
-		eventoEnviado.setColumns(10);
-		eventoEnviado.setBounds(316, 35, 164, 110);
-		frame.getContentPane().add(eventoEnviado);
-
-		eventoCriado = new JTextField();
-		eventoCriado.setEditable(false);
-		eventoCriado.setFont(new Font("Arial Black", Font.PLAIN, 35));
-		eventoCriado.setHorizontalAlignment(SwingConstants.CENTER);
-		eventoCriado.setColumns(10);
-		eventoCriado.setBounds(122, 35, 164, 110);
-		frame.getContentPane().add(eventoCriado);
-
 		Change.ScreenIndex(btnSair, frame);
+		Change.ScreenLogin(btnLogin, frame);
 
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.setBounds(120, 169, 554, 409);
 		frame.getContentPane().add(scrollPane);
-
-		Object[][] data = { { "teste", "26/04", "sim" }, { "teste", "26/04", "sim" }, { "teste", "26/04", "sim" },
-				{ "teste", "26/04", "sim" }, };
-		String[] colum = { "Nome", "data", "participar" };
-		tableEvento = new JTable(data, colum);
-		tableEvento.setFillsViewportHeight(true);
+		
+		tableEvento = new JTable();
+		tableEvento.setDragEnabled(true);
 		scrollPane.setViewportView(tableEvento);
-		QuadroEventos();
+		tableEvento.setModel(new DefaultTableModel(
+			new Object[][] {
+			},
+			new String[] {
+				"NOME", "descricao ", "valor"
+			}
+		) {
+			boolean[] columnEditables = new boolean[] {
+				false, false, false
+			};
+			public boolean isCellEditable(int row, int column) {
+				return false;
+			}
+		});
+		tableEvento.getColumnModel().getColumn(0).setResizable(false);
+		tableEvento.getColumnModel().getColumn(1).setResizable(false);
+		tableEvento.getColumnModel().getColumn(2).setResizable(false);
+		tableEvento.setFillsViewportHeight(true);
+		tableEvento.setColumnSelectionAllowed(true);
+		tableEvento.setCellSelectionEnabled(true);
+		Produtos();
+		
+		textField = new JTextField();
+		textField.setBounds(150, 31, 320, 40);
+		frame.getContentPane().add(textField);
+		textField.setColumns(10);
+		
+		carrinho.setBounds(564, 40, 89, 23);
+		frame.getContentPane().add(carrinho);
+		
+		screen.ScreenCarrinho(carrinho, frame);		
 	}
-
-	public static void QuadroEventos() {
-		int quantEvent = 50;
-		String event = String.format("%s", quantEvent) + "%";
-		eventoCriado.setText(event);
-		eventoEnviado.setText("15%");
-		eventoMarcado.setText("87%");
+	
+	public void Produtos() {
+		produtos.carrinho().forEach(datas ->{
+			produtos.carrinho();
+			DefaultTableModel table = (DefaultTableModel) tableEvento.getModel();
+			Object[] data = {datas.getNome(), datas.getDescricao(), datas.getValor()};
+			table.addRow(data);
+		});
 	}
+	
 }

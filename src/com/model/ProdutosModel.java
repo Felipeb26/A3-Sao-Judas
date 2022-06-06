@@ -9,13 +9,11 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UsuarioModel {
+public class ProdutosModel {
 	
 	private Long id;
-	private int idade;
+	private String idUsuario;
 	private String nome;
-	private String email;
-	private String endereco;
-	private String senha;
-	private String adm;
+	private String descricao;
+	private String valor;
 }
